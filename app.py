@@ -28,9 +28,10 @@ def file(filename):
             return render_template('file.html', contents=contents, title=filename)
     else:
         return render_template('404.html'), 404
-if __name__ == '__main__':
-    app.run(port = 3000)
 
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html'), 404
+
+if __name__ == '__main__':
+    app.run(port = 3000)
