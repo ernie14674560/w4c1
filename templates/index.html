@@ -5,8 +5,10 @@
     <title>Home</title>
 </head>
 <body>
-{% for Title in title %}
-    <span>{{ Title }}<br /></span>
+{% for Id, Title in title %}
+<span>
+    <a href="{{ url_for('files'), file_id = Id}}">{{ Title }}</a><br />
+</span>
 {% endfor %}
 </body>
 </html>

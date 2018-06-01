@@ -5,8 +5,11 @@
     <title>title</title>
 </head>
 <body>
-<p> title: {{ contents.title }}</p>
-<p> created_time: {{ contents.created_time }}</p>
-<p> content: {{ contents.content }} </p>
+<{% for Id, Content, Created_time, Category in title %}
+<span>{{ Id }}</span>
+<span>{{ Content }}</span>
+<span>{{ Created_time }}</span>
+<spqn>{{ Category }}<br /></spqn>
+{% endfor %}
 </body>
 </html>
