@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>title</title>
+    <title>{{contents.title}}</title>
 </head>
 <body>
-<{% for Id, Content, Created_time, Category in title %}
-<span>{{ Id }}</span>
-<span>{{ Content }}</span>
-<span>{{ Created_time }}</span>
-<spqn>{{ Category }}<br /></spqn>
-{% endfor %}
+<span>{{ contents.content }}<br /></span>
+<span>{{ contents.created_time }}<br /></span>
+<span>{{ contents.category }}<br /></span>
 </body>
 </html>

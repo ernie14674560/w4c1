@@ -7,7 +7,7 @@
 <body>
 {% for Id, Title in title %}
 <span>
-    <a href="{{ url_for('files'), file_id = Id}}">{{ Title }}</a><br />
+    <a href="{{ url_for('file', file_id = Id)}}">{{ Title }}<br /></a>
 </span>
 {% endfor %}
 </body>

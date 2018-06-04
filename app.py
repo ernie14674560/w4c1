@@ -7,34 +7,29 @@ import os
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/你創建的數據庫名稱'
-engine = SQLAlchemy.create_engine('mysql://root@localhost/你創建的數據庫名稱')
-Session = SQLAlchemy.sessionmaker(bind=engine)
-session = Session()
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/shiyanlou'
 db = SQLAlchemy(app)
 
 
 class File(db.Model):
-    __tablename__ == 'files'
+    __tablename__ = 'files'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), unique=True)
     created_time = db.Column(db.DateTime)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     content = db.Column(db.Text)
-    category = db.relationship('Category', backref=db.backref('files', lazy='dynamic'))
+    category = db.relationship('Category', uselist=False)
 
-    def __init__(self, title, category, content, created_time=None):
+    def __init__(self, title, created_time, category, content):
         self.title = title
-        if created_time is None:
-            created_time = datetime.utcnow()
         self.created_time = created_time
         self.category = category
         self.content = content
 
 
 class Category(db.Model):
-    __tablename__ == 'categories'
+    __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     files = db.relationship('File')
@@ -55,13 +50,13 @@ def insert_datas():
 
 @app.route('/')
 def index():
-    title = session.query(files.id, files.title).all()
-    return render_template('index.html', title=title)
+    titles = db.session.query(File.id, File.title).all()
+    return render_template('index.html', title=titles)
 
 
 @app.route('/files/<file_id>')
 def file(file_id):
-    contents = session.query.get_or_404(files.id, files.content, files.created_time, files.category).all()
+    contents = File.query.get_or_404(file_id)
     return render_template('file.html', contents=contents)
 
 
