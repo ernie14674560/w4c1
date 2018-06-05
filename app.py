@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from pymongo import MongoClient
 from datetime import datetime
-import os
+
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/shiyanlou'
 db = SQLAlchemy(app)
-
+client = MongoClient('127.0.0.1', 27017)
+mdb = client.shiyanlou
 
 class File(db.Model):
     __tablename__ = 'files'
@@ -27,6 +29,30 @@ class File(db.Model):
         self.category = category
         self.content = content
 
+    # 向文章添加標籤
+    def add_tag(self, tag_name):
+        # 為當前文章添加 tag_name 標籤存入到 MongoDB
+        tag = {'id': self.id, 'tag': tag_name}
+        mdb.tag.insert_one(tag)
+        pass
+
+    # 移除標籤
+    def remove_tag(self, tag_name):
+        # 從 MongoDB 中刪除當前文章的 tag_name 標籤
+        mdb.tag.deleteOne({'id': self.id})
+        pass
+
+    # 標籤列表
+    @property
+    def tags(self):
+        # 讀取 mongodb，返回當前文章的標籤列表
+        result = []
+        cursor = mdb.tag.find({'id': self.id})
+        for n in cursor:
+            result.append(n['tag'])
+        return result
+
+
 
 class Category(db.Model):
     __tablename__ = 'categories'
@@ -36,22 +62,11 @@ class Category(db.Model):
     def __init__(self, name):
         self.name = name
 
-def insert_datas():
-    db.create_all()
-    java = Category('Java')
-    python = Category('Python')
-    file1 = File('Hello Java', datetime.utcnow(), java, 'File Content - Java is cool!')
-    file2 = File('Hello Python', datetime.utcnow(), python, 'File Content - Python is cool!')
-    db.session.add(java)
-    db.session.add(python)
-    db.session.add(file1)
-    db.session.add(file2)
-    db.session.commit()
 
 @app.route('/')
 def index():
-    titles = db.session.query(File.id, File.title).all()
-    return render_template('index.html', title=titles)
+    files = File.query.all()
+    return render_template('index.html', files=files)
 
 
 @app.route('/files/<file_id>')
