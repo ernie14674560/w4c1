@@ -12,7 +12,7 @@ class GithubSpider(scrapy.Spider):
     @property
     def start_urls(self):
         # 課程列表頁面 url 模版
-        url_templ = 'https://github.com/shiyanlou?page={}&tab=repositories'
+        url_templ = 'https://github.com/shiyanlou?page={}"&"tab=repositories'
         # 所有要爬取的頁面
         urls = (url_templ.format(i) for i in range(1, 4))
         # 返回一個生成器，生成 Request 對象，生成器是可迭代對象
@@ -21,8 +21,8 @@ class GithubSpider(scrapy.Spider):
         return urls
 
     def parse(self, response):
-        for repo in response.css('li.col-12 d-block width-full py-4 border-bottom public source'):
+        for repo in response.css('li.col-12'):
             yield {
-                'name': repo.css('div.d-inline-block mb-1 a::text').extract_first(),
-                'update_time': repo.css('div.f6 text-gray mt-2 relative-time::attr(datetime)')
+                'name': repo.css('div.d-inline-block a[itemprop="name codeRepository"]::text').extract_first(),
+                'update_time': repo.css('div.f6 relative-time::attr(datetime)')
             }
