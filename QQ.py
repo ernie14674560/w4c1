@@ -12,9 +12,9 @@ class GithubSpider(scrapy.Spider):
     @property
     def start_urls(self):
         # 課程列表頁面 url 模版
-        url_templ = 'https://github.com/shiyanlou?page={}"&"tab=repositories'
+        url_templ = 'https://github.com/shiyanlou?page={}&tab=repositories'
         # 所有要爬取的頁面
-        urls = (url_templ.format(i) for i in range(1, 4))
+        urls = (url_templ.format(i) for i in range(1, 5))
         # 返回一個生成器，生成 Request 對象，生成器是可迭代對象
         # `scrapy`內部的下載器會下載每個`Request`，然後將結果封裝為`response`對象傳入`parse`方法，這個對象和前面scrapy shell
         # 練習中的對象是一樣的，也就是說你可以用`response.css()`或者`response.xpath()`來提取數據了。
@@ -24,5 +24,5 @@ class GithubSpider(scrapy.Spider):
         for repo in response.css('li.col-12'):
             yield {
                 'name': repo.css('div.d-inline-block a[itemprop="name codeRepository"]::text').extract_first(),
-                'update_time': repo.css('div.f6 relative-time::attr(datetime)')
+                'update_time': repo.css('div.f6 relative-time::attr(datetime)').extract_first()
             }
